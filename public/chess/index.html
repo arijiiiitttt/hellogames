@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chess Game</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .chess-board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      width: 100%;
+      max-width: 90vmin;
+      aspect-ratio: 1 / 1;
+      border: 4px solid #fff;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .square {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: calc(10px + 2vmin);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .white {
+      background-color: #eee;
+    }
+    .black {
+      background-color: #444;
+    }
+    .selected {
+      background-color: #ffd54f !important;
+    }
+    .valid-move {
+      background-color: #66bb6a !important;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chess Game</h1>
+  <div class="chess-board" id="board"></div>
+
+  <script>
+    const initialBoard = [
+      ['♜','♞','♝','♛','♚','♝','♞','♜'],
+      ['♟','♟','♟','♟','♟','♟','♟','♟'],
+      ['','','','','','','',''],
+      ['','','','','','','',''],
+      ['','','','','','','',''],
+      ['','','','','','','',''],
+      ['♙','♙','♙','♙','♙','♙','♙','♙'],
+      ['♖','♘','♗','♕','♔','♗','♘','♖'],
+    ];
+
+    const board = document.getElementById('board');
+    let selected = null;
+    let currentPlayer = 'white';
+    let validMoves = [];
+
+    function isWhite(piece) {
+      return '♙♖♘♗♕♔'.includes(piece);
+    }
+
+    function isBlack(piece) {
+      return '♟♜♞♝♛♚'.includes(piece);
+    }
+
+    function getPawnMoves(row, col, piece) {
+      const moves = [];
+      const direction = isWhite(piece) ? -1 : 1;
+      const startRow = isWhite(piece) ? 6 : 1;
+      const nextRow = row + direction;
+
+      if (initialBoard[nextRow][col] === '') {
+        moves.push([nextRow, col]);
+        if (row === startRow && initialBoard[row + direction * 2][col] === '') {
+          moves.push([row + direction * 2, col]);
+        }
+      }
+
+      for (let offset of [-1, 1]) {
+        const captureCol = col + offset;
+        if (captureCol >= 0 && captureCol < 8) {
+          const target = initialBoard[nextRow][captureCol];
+          if (target && isWhite(piece) !== isWhite(target)) {
+            moves.push([nextRow, captureCol]);
+          }
+        }
+      }
+
+      return moves;
+    }
+
+    function getLegalMoves(row, col, piece) {
+      if (piece === '♙' || piece === '♟') {
+        return getPawnMoves(row, col, piece);
+      }
+      return []; // only pawn moves supported for now
+    }
+
+    function createBoard() {
+      board.innerHTML = '';
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const square = document.createElement('div');
+          square.className = `square ${(row + col) % 2 === 0 ? 'white' : 'black'}`;
+          square.dataset.row = row;
+          square.dataset.col = col;
+          square.textContent = initialBoard[row][col];
+
+          if (selected && validMoves.some(move => move[0] === row && move[1] === col)) {
+            square.classList.add('valid-move');
+          }
+
+          if (selected && selected[0] == row && selected[1] == col) {
+            square.classList.add('selected');
+          }
+
+          square.addEventListener('click', handleClick);
+          board.appendChild(square);
+        }
+      }
+    }
+
+    function handleClick(e) {
+      const row = parseInt(e.currentTarget.dataset.row);
+      const col = parseInt(e.currentTarget.dataset.col);
+      const piece = initialBoard[row][col];
+
+      if (selected) {
+        if (validMoves.some(move => move[0] === row && move[1] === col)) {
+          const [prevRow, prevCol] = selected;
+          initialBoard[row][col] = initialBoard[prevRow][prevCol];
+          initialBoard[prevRow][prevCol] = '';
+          selected = null;
+          validMoves = [];
+          currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+          createBoard();
+        } else {
+          selected = null;
+          validMoves = [];
+          createBoard();
+        }
+      } else {
+        if (piece && ((currentPlayer === 'white' && isWhite(piece)) || (currentPlayer === 'black' && isBlack(piece)))) {
+          selected = [row, col];
+          validMoves = getLegalMoves(row, col, piece);
+          createBoard();
+        }
+      }
+    }
+
+    createBoard();
+  </script>
+</body>
+</html>

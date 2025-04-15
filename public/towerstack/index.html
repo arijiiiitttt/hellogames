@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower Stack</title>
+    <style>
+        /* General styles */
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #1e3c72, #2a5298);
+            color: white;
+        }
+
+        #game {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .block {
+            position: absolute;
+            height: 30px;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        button {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #ff4500;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            display: none;
+        }
+
+        button:hover {
+            background-color: #e63b00;
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div id="score">Score: 0</div>
+        <div id="game-over">
+            <p>Game Over!</p>
+            <p>Your Score: <span id="final-score"></span></p>
+        </div>
+        <button id="restart">Restart</button>
+    </div>
+
+    <script>
+        const game = document.getElementById("game");
+        const scoreDisplay = document.getElementById("score");
+        const gameOverText = document.getElementById("game-over");
+        const restartButton = document.getElementById("restart");
+
+        let score = 0;
+        let blockWidth = 150;
+        let currentBlock = null;
+        let basePosition = 0;
+        let movingRight = true;
+        let gameRunning = true;
+        let blockSpeed = 5;
+
+        // Sound effects
+        const dropSound = new Audio("https://www.soundjay.com/button/beep-07.wav");
+        const gameOverSound = new Audio("https://www.soundjay.com/button/beep-09.wav");
+
+        function createBlock() {
+            const block = document.createElement("div");
+            block.classList.add("block");
+            block.style.width = blockWidth + "px";
+            block.style.top = basePosition + "px";
+            block.style.left = "0px";
+            game.appendChild(block);
+            currentBlock = block;
+
+            moveBlock();
+        }
+
+        function moveBlock() {
+            const interval = setInterval(() => {
+                if (!gameRunning) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                const currentLeft = parseInt(currentBlock.style.left);
+                if (movingRight) {
+                    currentBlock.style.left = currentLeft + blockSpeed + "px";
+                    if (currentLeft + blockWidth >= window.innerWidth) {
+                        movingRight = false;
+                    }
+                } else {
+                    currentBlock.style.left = currentLeft - blockSpeed + "px";
+                    if (currentLeft <= 0) {
+                        movingRight = true;
+                    }
+                }
+            }, 10);
+        }
+
+        function dropBlock() {
+            if (!gameRunning) return;
+
+            dropSound.play();
+
+            const newBlockLeft = parseInt(currentBlock.style.left);
+            const newBlockWidth = Math.min(blockWidth, window.innerWidth - newBlockLeft);
+
+            // Check for misalignment
+            if (newBlockWidth <= 0) {
+                endGame();
+                return;
+            }
+
+            // Update base position and block width
+            basePosition += 30;
+            blockWidth = newBlockWidth;
+            score++;
+            blockSpeed += 0.5; // Increase difficulty
+            scoreDisplay.innerText = `Score: ${score}`;
+
+            // Fix the block and create a new one
+            currentBlock.style.width = blockWidth + "px";
+            currentBlock.style.left = newBlockLeft + "px";
+            currentBlock = null;
+            createBlock();
+        }
+
+        function endGame() {
+            gameOverSound.play();
+            gameRunning = false;
+            gameOverText.style.display = "block";
+            restartButton.style.display = "block";
+            document.getElementById("final-score").innerText = score;
+        }
+
+        restartButton.addEventListener("click", () => {
+            location.reload();
+        });
+
+        // Start the game
+        document.addEventListener("click", dropBlock);
+        createBlock();
+    </script>
+</body>
+</html>
