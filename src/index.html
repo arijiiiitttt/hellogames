@@ -3,26 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Game Portfolio</title>
-    <link rel="stylesheet" href="/src/css/style.css">
-    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Games</title>
 </head>
 <body>
-    <header>
-        <h1>My Game Development Portfolio</h1>
-        <p>A collection of games I've created</p>
-    </header>
-    
-    <main>
-        <section class="games-grid" id="games-container">
-            <!-- Games will be dynamically inserted here -->
-        </section>
-    </main>
-    
-    <footer>
-        <p>© <span id="current-year"></span> My Game Portfolio. All rights reserved.</p>
-    </footer>
-    
-    <script src="/src/js/script.js"></script>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">👋🏻Games</a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+            <div class="nav-menu">
+                <a href="#" class="nav-link">Get Started</a>
+                <a href="#" class="nav-link">Create strategy</a>
+                <a href="#" class="nav-link">Pricing</a>
+                <a href="#" class="nav-link">Contact</a>
+                <a href="#" class="nav-link">Solution</a>
+                <a href="#" class="nav-link">E-Commerce</a>
+            </div>
+            <div class="nav-right">
+                <a href="#" class="nav-icon">👤</a>
+                <a href="#" class="nav-icon">🌐</a>
+            </div>
+        </div>
+    </nav>
 </body>
+<script src="js/script.js"></script>
 </html>
