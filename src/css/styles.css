@@ -58,7 +58,7 @@ h1 span {
 
 .navbar {
     background-color: var(--white);
-    padding: 1rem 1rem;
+    padding: 3rem 4rem;
     width: 100%;
     border-bottom: 2px solid rgba(0, 0, 0, 0.1);
     position: sticky;
@@ -392,3 +392,4 @@ h1 span {
     animation: colorChange 8s infinite;
     display: inline;
 }
+
